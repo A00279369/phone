@@ -1,9 +1,7 @@
 # phone
 Phone rest app
 
-a Spring Boot RESTful Web Service application that will be used to manage two data types:
-
-
+a Spring Boot RESTful Web Service application
 
 Code build using maven :
 
