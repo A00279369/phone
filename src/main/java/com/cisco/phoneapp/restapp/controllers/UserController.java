@@ -1,13 +1,12 @@
 package com.cisco.phoneapp.restapp.controllers;
 
-import com.cisco.phoneapp.restapp.dto.UserDto;
 import com.cisco.phoneapp.restapp.entities.Phone;
 import com.cisco.phoneapp.restapp.entities.User;
 import com.cisco.phoneapp.restapp.exceptions.PhoneNotFoundException;
 import com.cisco.phoneapp.restapp.exceptions.UserNotFoundException;
 import com.cisco.phoneapp.restapp.repositories.PhoneRepository;
 import com.cisco.phoneapp.restapp.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,27 +24,30 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class UserController {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private PhoneRepository phoneRepository;
+
+
+    public UserController(UserRepository userRepository,PhoneRepository phoneRepository){
+        this.userRepository = userRepository;
+        this.phoneRepository = phoneRepository;
+    }
 
     /**
     Add a user to the system
     */
+    @ApiOperation(value = "add a User", notes = "Add a user to the system")
     @PostMapping("/user")
-    public ResponseEntity<User> addUser(@RequestBody UserDto userDto ){
-     User user = UserMapper.mapToUser(userDto);
+    public ResponseEntity<User> addUser(@RequestBody User user ){
      user =userRepository.save(user);
-
-     user.add(linkTo(methodOn(UserController.class).addUser(userDto)).withSelfRel());
+     user.add(linkTo(methodOn(UserController.class).users(user.getUserId())).withSelfRel());
      return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     /**
     Delete a user from the system
     */
+    @ApiOperation(value = "Delete a User", notes = "Delete a user to the system")
     @DeleteMapping("/user/{id}")
     @Transactional
     public void deleteUser(@PathVariable UUID id){
@@ -60,6 +62,7 @@ public class UserController {
      /**
      List users in the system
     */
+     @ApiOperation(value = "List Users", notes = "List user's in the system")
      @GetMapping("/user")
      public List<User> users(){
          return userRepository.findAll().stream()
@@ -70,6 +73,7 @@ public class UserController {
     /**
      Single user in the system
      */
+    @ApiOperation(value = "Single User", notes = "Single user to the system")
     @GetMapping("/user/{userId}")
     public ResponseEntity<User> users(@PathVariable UUID userId){
         return userRepository
@@ -83,8 +87,9 @@ public class UserController {
     /**
      User phone in the system
      */
+    @ApiOperation(value = "Users' Phone", notes = "User phone in the system")
     @GetMapping("/user/{userId}/phone/{phoneId}")
-    public ResponseEntity getPhone(@PathVariable UUID userId,@PathVariable UUID phoneId){
+    public ResponseEntity<Phone> getPhone(@PathVariable UUID userId,@PathVariable UUID phoneId){
         return phoneRepository
                 .findPhoneByPhoneIdAndUserId(phoneId,userId)
                 .map(p -> {
@@ -98,6 +103,7 @@ public class UserController {
     /**
      Add a phone to a user
      */
+    @ApiOperation(value = "Add a Phone to a User", notes = "Add a Phone to a User")
     @PostMapping("/user/{userId}/phone")
     public ResponseEntity<Phone> addPhoneToUser(@PathVariable UUID userId, @RequestBody Phone phone ){
         Optional<User> userOpt =userRepository.findByUserId(userId);
@@ -115,6 +121,7 @@ public class UserController {
     /**
      Delete a user's phone
      */
+    @ApiOperation(value = "Delete a users' phone", notes = "Delete a users' phone")
     @DeleteMapping("/user/phone/{phoneId}")
     @Transactional
     public void deletePhone(@PathVariable UUID phoneId ) {
@@ -138,6 +145,7 @@ public class UserController {
     /**
      List a user's phones
      */
+    @ApiOperation(value = "List a users' phones", notes = "List a users' phones")
     @GetMapping("/user/{userId}/phone")
     public List<Phone> listPhones(@PathVariable UUID userId){
         return phoneRepository.findAllByUserId(userId)
@@ -149,8 +157,9 @@ public class UserController {
     /**
      Update a user's preferred phone number
      */
+    @ApiOperation(value = "Update preferred phone number", notes = "Update a user's preferred phone number")
     @PutMapping("/user/{userId}")
-    public ResponseEntity updatePreferredPhoneNumber(@PathVariable UUID userId ,@RequestParam String preferredPhoneNumber){
+    public ResponseEntity<User> updatePreferredPhoneNumber(@PathVariable UUID userId ,@RequestParam String preferredPhoneNumber){
       Optional<User> userOpt = userRepository.findById(userId);
 
       if(userOpt.isPresent()){
@@ -163,7 +172,5 @@ public class UserController {
       else{
           throw new UserNotFoundException("Unable to find User with id :" + userId);
       }
-
     }
-
 }

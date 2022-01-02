@@ -10,6 +10,11 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
+/**
+ * Users' phone represenatation.
+ *
+ *
+ */
 @Entity
 public class Phone extends RepresentationModel<Phone> {
     @Id

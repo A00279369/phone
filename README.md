@@ -14,3 +14,10 @@ Run jar using :
 ```
 java -jar restapp-0.0.1-SNAPSHOT.jar
 ```
+
+
+Swagger UI
+
+http://localhost/swagger-ui/#/user-controller
+
+

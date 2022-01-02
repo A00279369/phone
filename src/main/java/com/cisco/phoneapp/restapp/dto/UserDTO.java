@@ -1,13 +1,20 @@
 package com.cisco.phoneapp.restapp.dto;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
-public class UserDto {
+public class UserDTO {
 
+    @NotBlank(message = "UserId cannot be null")
     private UUID userId;
+    @NotBlank(message = "UserName cannot be null")
     private String userName;
+    @NotBlank(message = "Password cannot be null")
     private String password;
+    @Email
     private String emailAddress;
+
     private String preferredPhoneNumber;
 
     public UUID getUserId() {

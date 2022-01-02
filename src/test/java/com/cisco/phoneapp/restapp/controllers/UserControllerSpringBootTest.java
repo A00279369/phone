@@ -4,6 +4,7 @@ import com.cisco.phoneapp.restapp.fixtures.UserFixture;
 import com.cisco.phoneapp.restapp.repositories.PhoneRepository;
 import com.cisco.phoneapp.restapp.repositories.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,6 @@ public class UserControllerSpringBootTest {
 		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(get("/user"))
 		  .andDo(print()).andExpect(status().isOk())
-//		  .andExpect(content().json(getResponse()))
 		;
 	}
 
@@ -75,7 +75,7 @@ public class UserControllerSpringBootTest {
 		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(post("/user")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(getJSON(UserFixture.getUserDto1()))
+				.content(getJSON(UserFixture.getUser1()))
 		)
 				.andDo(print()).andExpect(status().isCreated());
 	}
@@ -119,11 +119,10 @@ public class UserControllerSpringBootTest {
 	}
 
 
-
     private String getJSON(Object object) throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper =
+		new ObjectMapper().configure(MapperFeature.USE_ANNOTATIONS, false);
 		return mapper.writeValueAsString(object);
-
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.cisco.phoneapp.restapp.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Type;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -12,6 +13,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * User representation
+ *
+ */
 @Entity
 public class User extends RepresentationModel<User> {
 
@@ -21,6 +26,8 @@ public class User extends RepresentationModel<User> {
     private UUID userId;
     @NotBlank(message = "username is mandatory")
     private String userName;
+
+
     @NotBlank(message = "password is mandatory")
     private String password;
 
@@ -60,6 +67,7 @@ public class User extends RepresentationModel<User> {
         this.userName = userName;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
