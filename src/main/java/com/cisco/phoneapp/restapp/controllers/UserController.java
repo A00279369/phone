@@ -3,6 +3,8 @@ package com.cisco.phoneapp.restapp.controllers;
 import com.cisco.phoneapp.restapp.entities.Phone;
 import com.cisco.phoneapp.restapp.entities.User;
 import com.cisco.phoneapp.restapp.exceptions.PhoneNotFoundException;
+import com.cisco.phoneapp.restapp.exceptions.PreferredPhoneNumberNotValidException;
+import com.cisco.phoneapp.restapp.exceptions.UserCreationFailedException;
 import com.cisco.phoneapp.restapp.exceptions.UserNotFoundException;
 import com.cisco.phoneapp.restapp.repositories.PhoneRepository;
 import com.cisco.phoneapp.restapp.repositories.UserRepository;
@@ -24,8 +26,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class UserController {
 
-    private UserRepository userRepository;
-    private PhoneRepository phoneRepository;
+    private final UserRepository userRepository;
+    private final PhoneRepository phoneRepository;
 
 
     public UserController(UserRepository userRepository,PhoneRepository phoneRepository){
@@ -39,9 +41,13 @@ public class UserController {
     @ApiOperation(value = "add a User", notes = "Add a user to the system")
     @PostMapping("/user")
     public ResponseEntity<User> addUser(@RequestBody User user ){
-     user =userRepository.save(user);
-     user.add(linkTo(methodOn(UserController.class).users(user.getUserId())).withSelfRel());
-     return new ResponseEntity<>(user, HttpStatus.CREATED);
+     try {
+         user = userRepository.save(user);
+         user.add(linkTo(methodOn(UserController.class).users(user.getUserId())).withSelfRel());
+         return new ResponseEntity<>(user, HttpStatus.CREATED);
+     }catch(Exception e){
+         throw new UserCreationFailedException(e.getMessage());
+     }
     }
 
     /**
@@ -53,7 +59,6 @@ public class UserController {
     public void deleteUser(@PathVariable UUID id){
         try {
             userRepository.deleteById(id);
-            phoneRepository.deletePhoneByUserId(id);
         } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Unable to find User with id :" + id);
         }
@@ -90,8 +95,14 @@ public class UserController {
     @ApiOperation(value = "Users' Phone", notes = "User phone in the system")
     @GetMapping("/user/{userId}/phone/{phoneId}")
     public ResponseEntity<Phone> getPhone(@PathVariable UUID userId,@PathVariable UUID phoneId){
+        Optional<User> userOpt = userRepository.findByUserId(userId);
+        if(userOpt.isEmpty()){
+            throw new UserNotFoundException("User not found :" + userId );
+        }
+        User user = userOpt.get();
+
         return phoneRepository
-                .findPhoneByPhoneIdAndUserId(phoneId,userId)
+                .findPhoneByPhoneIdAndUser(phoneId,user)
                 .map(p -> {
                      p.add(linkTo(methodOn(UserController.class).getPhone(userId,phoneId)).withSelfRel());
                      p.add(linkTo(methodOn(UserController.class).users(userId)).withRel("user"));
@@ -108,7 +119,7 @@ public class UserController {
     public ResponseEntity<Phone> addPhoneToUser(@PathVariable UUID userId, @RequestBody Phone phone ){
         Optional<User> userOpt =userRepository.findByUserId(userId);
         if(userOpt.isPresent()){
-            phone.setUserId(userId);
+            phone.setUser(userOpt.get());
             phone = phoneRepository.save(phone);
             phone.add(linkTo(methodOn(UserController.class).addPhoneToUser(userId,phone)).withSelfRel());
             return new ResponseEntity<>(phone, HttpStatus.CREATED);
@@ -148,9 +159,15 @@ public class UserController {
     @ApiOperation(value = "List a users' phones", notes = "List a users' phones")
     @GetMapping("/user/{userId}/phone")
     public List<Phone> listPhones(@PathVariable UUID userId){
-        return phoneRepository.findAllByUserId(userId)
+        Optional<User> userOpt = userRepository.findByUserId(userId);
+        if(userOpt.isEmpty()){
+            throw new UserNotFoundException("User not found :" + userId );
+        }
+        User user = userOpt.get();
+
+        return phoneRepository.findAllByUser(user)
                 .stream()
-                .map( u -> u.add(linkTo(methodOn(UserController.class).getPhone(u.getUserId(),u.getPhoneId())).withSelfRel()))
+                .map( u -> u.add(linkTo(methodOn(UserController.class).getPhone(userId,u.getPhoneId())).withSelfRel()))
                 .collect(Collectors.toList());
     }
 
@@ -159,18 +176,31 @@ public class UserController {
      */
     @ApiOperation(value = "Update preferred phone number", notes = "Update a user's preferred phone number")
     @PutMapping("/user/{userId}")
-    public ResponseEntity<User> updatePreferredPhoneNumber(@PathVariable UUID userId ,@RequestParam String preferredPhoneNumber){
+    public ResponseEntity<User> updatePreferredPhoneNumber(@PathVariable UUID userId ,@RequestParam String preferredPhoneNumber) {
       Optional<User> userOpt = userRepository.findById(userId);
 
       if(userOpt.isPresent()){
           User user = userOpt.get();
-          user.setPreferredPhoneNumber(preferredPhoneNumber);
-          userRepository.save(user);
-          user.add(linkTo(methodOn(UserController.class).users(userId)).withSelfRel());
-          return new ResponseEntity<>(user, HttpStatus.OK);
+          if(isValidPreferredPhoneNumber(user,preferredPhoneNumber)) {
+              user.setPreferredPhoneNumber(preferredPhoneNumber);
+              userRepository.save(user);
+              user.add(linkTo(methodOn(UserController.class).users(userId)).withSelfRel());
+              return new ResponseEntity<>(user, HttpStatus.OK);
+          }
+          else{
+              throw new PreferredPhoneNumberNotValidException("Preferred Phone Number "+preferredPhoneNumber+"not valid for User :" + userId.toString());
+          }
       }
       else{
           throw new UserNotFoundException("Unable to find User with id :" + userId);
       }
     }
+
+    private boolean isValidPreferredPhoneNumber(User user , String preferredPhoneNumber){
+       return user.getPhones()
+               .stream()
+               .anyMatch(p -> p.getPhoneNumber().equalsIgnoreCase(preferredPhoneNumber));
+    }
+
 }
+

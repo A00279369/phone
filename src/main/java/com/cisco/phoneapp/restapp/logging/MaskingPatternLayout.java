@@ -10,6 +10,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Layout for logback config. Used to mask values in log file e.g. "password"
+ *
+ */
 public class MaskingPatternLayout extends PatternLayout {
 
     private Pattern multilinePattern;

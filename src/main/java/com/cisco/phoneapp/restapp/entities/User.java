@@ -1,16 +1,16 @@
 package com.cisco.phoneapp.restapp.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.springframework.hateoas.RepresentationModel;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -18,15 +18,21 @@ import java.util.UUID;
  *
  */
 @Entity
+@Table(name = "user")
+@JsonIgnoreProperties({"phones"})
 public class User extends RepresentationModel<User> {
 
     @Id
     @Type(type="uuid-char")
     @Column(name = "user_Id")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
     private UUID userId;
     @NotBlank(message = "username is mandatory")
     private String userName;
-
 
     @NotBlank(message = "password is mandatory")
     private String password;
@@ -37,8 +43,15 @@ public class User extends RepresentationModel<User> {
 
     private String preferredPhoneNumber;
 
-    @OneToMany(mappedBy="user")
-    Set <Phone> phones;
+
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    List<Phone> phones;
 
     public User(){}
 
@@ -93,4 +106,11 @@ public class User extends RepresentationModel<User> {
     }
 
 
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<Phone> phones) {
+        this.phones = phones;
+    }
 }

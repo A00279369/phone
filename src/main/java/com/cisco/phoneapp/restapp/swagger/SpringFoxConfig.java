@@ -42,8 +42,4 @@ public class SpringFoxConfig {
 				.apiInfo(CUSTOM_API_INFO);
 	
 	}
-
-	
-	
-
 }

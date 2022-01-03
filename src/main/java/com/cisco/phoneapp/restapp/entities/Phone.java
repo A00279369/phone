@@ -1,12 +1,11 @@
 package com.cisco.phoneapp.restapp.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;
 import org.springframework.hateoas.RepresentationModel;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
@@ -16,11 +15,10 @@ import java.util.UUID;
  *
  */
 @Entity
+@Table(name = "phone")
 public class Phone extends RepresentationModel<Phone> {
     @Id
     @Type(type="uuid-char")
-//    @Column(name = "phoneId", columnDefinition = "BINARY(16)")
-
     private UUID phoneId;
     @NotBlank(message = "phoneName is mandatory")
     private String phoneName;
@@ -29,19 +27,19 @@ public class Phone extends RepresentationModel<Phone> {
     @NotBlank(message = "phoneNumber is mandatory")
     private String phoneNumber;
 
-    @Type(type="uuid-char")
-    private UUID userId;
 
-    @ManyToOne
-    @JoinColumn
+    @JsonIgnoreProperties
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    @JsonBackReference
     private User user;
 
-    public Phone(UUID phoneId, String phoneName, String phoneModel, String phoneNumber, UUID userId) {
+    public Phone(UUID phoneId, String phoneName, String phoneModel, String phoneNumber, User user) {
         this.phoneId = phoneId;
         this.phoneName = phoneName;
         this.phoneModel = phoneModel;
         this.phoneNumber = phoneNumber;
-        this.userId = userId;
+        this.user = user;
     }
 
     public Phone() {
@@ -79,11 +77,11 @@ public class Phone extends RepresentationModel<Phone> {
         this.phoneNumber = phoneNumber;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

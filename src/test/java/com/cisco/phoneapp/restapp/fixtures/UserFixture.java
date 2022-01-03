@@ -36,7 +36,7 @@ public class UserFixture {
 	public static User getUser3 () { return new User(UUID.randomUUID(),"","password3","","");}
 
 	public static Phone getPhone1 (UUID userId) {
-	   	return new Phone( UUID.randomUUID(), "phoneName", "phoneModel", "phoneNumber",userId);}
+	   	return new Phone( UUID.randomUUID(), "phoneName", "phoneModel", "phoneNumber", getUser1());}
 
 
 	public static User getValidUser() {
@@ -48,10 +48,5 @@ public class UserFixture {
 		  ObjectMapper objectMapper = new ObjectMapper();
 		  return objectMapper.writeValueAsString(user);
 	  }
-
-//	  public static String getJSON(User user) throws Exception {
-//		  ObjectMapper objectMapper = new ObjectMapper();
-//		  return objectMapper.writeValueAsString(user);
-//	  }
 
 }

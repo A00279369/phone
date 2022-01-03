@@ -7,10 +7,14 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+/**
+ * Use Basic authentication
+ *
+ */
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        // Create 2 users for demo
+        // Simple Users
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -21,7 +25,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
         }
 
-        // Secure the endpoins with HTTP Basic authentication
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
 

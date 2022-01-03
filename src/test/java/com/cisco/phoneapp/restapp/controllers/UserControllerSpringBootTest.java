@@ -21,7 +21,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,14 +46,16 @@ public class UserControllerSpringBootTest {
 	private PhoneRepository phoneRepository;
 
 
-	private UUID userId = UUID.fromString ("93f3ed0a-92bd-4c82-ba0e-c098111cef59");
-	private UUID phoneId = UUID.fromString ("2a810635-18d0-40ce-ada6-0c0fd1181225");
-
+	private final UUID userId = UUID.fromString ("93f3ed0a-92bd-4c82-ba0e-c098111cef59");
+	private final UUID phoneId = UUID.fromString ("2a810635-18d0-40ce-ada6-0c0fd1181225");
+	private final UUID invalidPhoneId =UUID.randomUUID();
+	private final UUID invalidUserId =UUID.randomUUID();
+	private final String validPhoneNumber = "+353881234567";
+	private final String ineligiblePhoneNumber = "+000000000001";
 
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void getUserTest() throws Exception {
-		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(get("/user"))
 		  .andDo(print()).andExpect(status().isOk())
 		;
@@ -63,16 +64,22 @@ public class UserControllerSpringBootTest {
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void deleteUserTest() throws Exception {
-		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(delete("/user/"+userId))
 				.andDo(print()).andExpect(status().isOk());
+	}
+
+	@Test
+	@WithMockUser(username = "user" ,password = "password")
+	public void deleteUser_invalidUserIdTest() throws Exception {
+		this.mockMvc.perform(delete("/user/"+invalidUserId))
+				.andDo(print()).andExpect(status().isNotFound());
 	}
 
 
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void addUserTest() throws Exception {
-		assertThat(userRepository).isNotNull();
+
 		this.mockMvc.perform(post("/user")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(getJSON(UserFixture.getUser1()))
@@ -85,7 +92,6 @@ public class UserControllerSpringBootTest {
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void addPhoneToUser() throws Exception {
-		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(post("/user/"+userId.toString()+"/phone")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(getJSON(UserFixture.getPhone1(userId)))
@@ -96,16 +102,20 @@ public class UserControllerSpringBootTest {
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void deletePhoneTest() throws Exception {
-		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(delete("/user/phone/"+phoneId.toString()))
 				    .andDo(print()).andExpect(status().isOk());
 	}
 
+	@Test
+	@WithMockUser(username = "user" ,password = "password")
+	public void deletePhone_invalidPhoneIdTest() throws Exception {
+		this.mockMvc.perform(delete("/user/phone/"+invalidPhoneId))
+				.andDo(print()).andExpect(status().isNotFound());
+	}
 
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void listPhoneTest() throws Exception {
-		assertThat(userRepository).isNotNull();
 		this.mockMvc.perform(get("/user/"+userId.toString()+"/phone"))
 				.andDo(print()).andExpect(status().isOk());
 	}
@@ -113,12 +123,34 @@ public class UserControllerSpringBootTest {
 	@Test
 	@WithMockUser(username = "user" ,password = "password")
 	public void updatePreferredPhoneNumberTest() throws Exception {
-		this.mockMvc.perform(put("/user/"+userId.toString()+"?preferredPhoneNumber=+353866011765"   ))
+		this.mockMvc.perform(put("/user/"+userId.toString()+"?preferredPhoneNumber=+353881234567"   ))
 				.andDo(print()).andExpect(status().isOk());
 
 	}
 
+	@Test
+	@WithMockUser(username = "user" ,password = "password")
+	public void updatePreferredPhoneNumberTest_invalidUser() throws Exception {
+		this.mockMvc.perform(put("/user/"+invalidUserId.toString()+"?preferredPhoneNumber="+validPhoneNumber   ))
+				.andDo(print()).andExpect(status().isNotFound());
 
+	}
+
+	@Test
+	@WithMockUser(username = "user" ,password = "password")
+	public void updatePreferredPhoneNumberTest_ineligblePhoneNumber() throws Exception {
+		this.mockMvc.perform(put("/user/"+invalidUserId.toString()+"?preferredPhoneNumber="+ineligiblePhoneNumber   ))
+				.andDo(print()).andExpect(status().isNotFound());
+
+	}
+
+
+	/**
+	 * Ignore Json processing annotations
+	 * @param object to convert to Json
+	 * @return Json string
+	 * @throws JsonProcessingException
+	 */
     private String getJSON(Object object) throws JsonProcessingException {
 		ObjectMapper mapper =
 		new ObjectMapper().configure(MapperFeature.USE_ANNOTATIONS, false);
