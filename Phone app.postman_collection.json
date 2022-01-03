@@ -1,0 +1,305 @@
+{
+	"info": {
+		"_postman_id": "84a44d70-1d1e-400b-970a-e22d170a871a",
+		"name": "Phone app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user' phones",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59/phone",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+						"phone"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get Phone",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59/phone/2a810635-18d0-40ce-ada6-0c0fd1181225",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+						"phone",
+						"2a810635-18d0-40ce-ada6-0c0fd1181225"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add phone to user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"phoneId\": \"2a810635-18d0-40ce-ada6-0c0fd1181325\",\r\n        \"phoneName\": \"John's 2nd Pixel\",\r\n        \"phoneModel\": \"ANDROID\",\r\n        \"phoneNumber\": \"+353881234568\",\r\n        \"userId\": \"93f3ed0a-92bd-4c82-ba0e-c098111cef59\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59/phone",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+						"phone"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete Phone from user",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59/phone",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+						"phone"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Preferred Phone No",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/user/93f3ed0a-92bd-4c82-ba0e-c098111cef59/?preferredPhoneNumber=%2B353881234569",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user",
+						"93f3ed0a-92bd-4c82-ba0e-c098111cef59",
+						""
+					],
+					"query": [
+						{
+							"key": "preferredPhoneNumber",
+							"value": "%2B353881234569"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add user",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"userId\": \"93f3ed0a-92bd-4c82-ba0e-c098111cef62\",\r\n        \"userName\": \"fred_user\",\r\n        \"emailAddress\": \"mary@example.com\",\r\n        \"preferredPhoneNumber\": \"+353881234570\",\r\n        \"password\":\"mypassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
