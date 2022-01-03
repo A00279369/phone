@@ -11,8 +11,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
+ *
  * Layout for logback config. Used to mask values in log file e.g. "password"
  *
+ * based on https://www.baeldung.com/logback-mask-sensitive-data
  */
 public class MaskingPatternLayout extends PatternLayout {
 

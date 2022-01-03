@@ -8,6 +8,8 @@ import com.cisco.phoneapp.restapp.exceptions.UserCreationFailedException;
 import com.cisco.phoneapp.restapp.exceptions.UserNotFoundException;
 import com.cisco.phoneapp.restapp.repositories.PhoneRepository;
 import com.cisco.phoneapp.restapp.repositories.UserRepository;
+import com.cisco.phoneapp.restapp.swagger.SpringFoxConfig;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@Api(value="Phone app" ,tags= {SpringFoxConfig.PHONE_APP_TAG})
 @RestController
 public class UserController {
 
@@ -53,7 +56,7 @@ public class UserController {
     /**
     Delete a user from the system
     */
-    @ApiOperation(value = "Delete a User", notes = "Delete a user to the system")
+    @ApiOperation(value = "Delete a User", notes = "Delete a user in the system")
     @DeleteMapping("/user/{id}")
     @Transactional
     public void deleteUser(@PathVariable UUID id){
@@ -163,12 +166,12 @@ public class UserController {
         if(userOpt.isEmpty()){
             throw new UserNotFoundException("User not found :" + userId );
         }
-        User user = userOpt.get();
 
-        return phoneRepository.findAllByUser(user)
+        return userOpt.get().getPhones()
                 .stream()
                 .map( u -> u.add(linkTo(methodOn(UserController.class).getPhone(userId,u.getPhoneId())).withSelfRel()))
                 .collect(Collectors.toList());
+
     }
 
     /**
